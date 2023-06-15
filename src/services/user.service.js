@@ -1,6 +1,8 @@
-import User from '../config/firestore.js'
 
-import { producerFn } from '../kafka/producer.js';
+import User from '../config/firestore.js'
+import userModel from '../model/user.model.js'
+
+// import { producerFn } from '../kafka/producer.js';
 
 //get all users
 export const getAllUsers = async () => {
@@ -8,41 +10,36 @@ export const getAllUsers = async () => {
   const result = res.docs.map((value) =>
     ({ id: value.id, ...value.data() })
   )
-  await producerFn(result)
+  // await producerFn(result)
   return result;
 
 };
 
-//create new user
-export const newUser = async (body) => {
-  const docRef = await User.add(body);
-  let id = docRef.id
+export async function newUser(id, name, age, email, interests) {
+  try {
+    const user = userModel.createUser(id, name, age, email, interests);
 
-  // Retrieve the added data
-  const docSnapshot = await docRef.get();
-  const addedData = docSnapshot.data();
-  const result = { id, ...addedData }
+    // Add user data to Firestore
 
-  await producerFn(result)
+    const docRef = await User.add(user.toFirestore());
 
-  // Return the added data or perform any desired actions here
-  return result;
+    // Retrieve the added user data
+    const docSnapshot = await docRef.get();
+    const addedUser = userModel.getUserFromFirestore(docSnapshot);
 
+    return addedUser;
+  } catch (error) {
+    throw error;
+  }
+}
 
-};
 
 //update single user
 export const updateUser = async (_id, body) => {
-  // let docRef = await User.doc(_id).update(body)
-
-  const userRef = User.doc(_id);
-  await userRef.update(body);
-  const userSnapshot = await userRef.get();
-  const updatedData = userSnapshot.data();
-  updatedData.id = userSnapshot.id;
-
-  // Return the updated data or perform any desired actions here
-  return updatedData;
+  await User.doc(_id).update(body)
+  const docSnapshot = await User.doc(_id).get();
+  const updatedUser = userModel.getUserFromFirestore(docSnapshot);
+  return updatedUser;
 };
 
 //delete single user
@@ -53,21 +50,12 @@ export const deleteUser = async (id) => {
 
 //get single user
 export const getUser = async (id) => {
-  // const res = await User.doc(id).get();
-  const userRef = User.doc(id);
-  const userSnapshot = await userRef.get();
+  const docSnapshot = await User.doc(id).get();
 
-  if (!userSnapshot.exists) {
-    throw new Error('User not found');
+  if (!docSnapshot.exists) {
+    throw new Error('User not found....');
   }
-
-  const userData = userSnapshot.data();
-
-
-  // Include the ID in the returned object
-  userData.id = userSnapshot.id;
-
-  // Return the retrieved data with the ID or perform any desired actions here
-  return userData;
+  const user = userModel.getUserFromFirestore(docSnapshot);
+  return user;
 
 };

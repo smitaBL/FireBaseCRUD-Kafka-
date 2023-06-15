@@ -1,20 +1,36 @@
 import firebase from 'firebase';
+import dotenv from 'dotenv';
+dotenv.config();
+
+
+
+// AUTHDOMAIN = "fir-4c8ff.firebaseapp.com"
+
+// PROJECT_ID = "fir-4c8ff"
+
+// STOREGE_BUCKET = "fir-4c8ff.appspot.com"
+
+// MSG_SENDER_ID = "862346333854"
+
+// APP_ID = "1:862346333854:web:04eeb0a5442c191092358f"
+
+// MEASUREMENT_ID = "G-ECNFH113TT"
 
 const firebaseConfig = {
 
-    apiKey: "AIzaSyAh2g6VWPFNhljAvoU901HgP0PkjDI5sNU",
+    apiKey: process.env.API_KEY,
 
-    authDomain: "fir-4c8ff.firebaseapp.com",
+    authDomain: process.env.AUTHDOMAIN,
 
-    projectId: "fir-4c8ff",
+    projectId: process.env.PROJECT_ID,
 
-    storageBucket: "fir-4c8ff.appspot.com",
+    storageBucket: process.env.STOREGE_BUCKET,
 
-    messagingSenderId: "862346333854",
+    messagingSenderId: process.env.MSG_SENDER_ID,
 
-    appId: "1:862346333854:web:04eeb0a5442c191092358f",
+    appId: process.env.APP_ID,
 
-    measurementId: "G-ECNFH113TT"
+    measurementId: process.env.MEASUREMENT_ID,
 
 };
 
